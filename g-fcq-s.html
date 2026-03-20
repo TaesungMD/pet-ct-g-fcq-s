@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>G-FCQ-S Task</title>
+  <script src="https://unpkg.com/jspsych@7.3.4"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-html-slider-response@1.1.3"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-html-button-response@1.1.3"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response@1.1.3"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-survey-html-form@1.0.3"></script>
+  <link href="https://unpkg.com/jspsych@7.3.4/css/jspsych.css" rel="stylesheet" type="text/css" />
+  <style>
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      overscroll-behavior-y: none;
+      -webkit-user-select: none;
+      user-select: none;
+      -webkit-touch-callout: none;
+      touch-action: pan-x pan-y;
+    }
+
+    .jspsych-content {
+      font-size: 45px;
+      line-height: 1.5;
+    }
+
+    input[type=range] {
+      height: 20px;
+      width: 100%;
+    }
+
+    input[type=range]::-webkit-slider-thumb {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: #007bff;
+      cursor: pointer;
+      -webkit-appearance: none;
+      margin-top: -30px;
+    }
+
+    .jspsych-html-slider-response-container {
+      width: 520px !important;
+      margin: auto;
+    }
+
+    #slider-labels {
+      font-size: 32px;
+      margin-top: 30px;
+    }
+
+    .jspsych-btn {
+      font-size: 32px;
+      padding: 20px 45px;
+      margin-top: 50px;
+      border-radius: 15px;
+    }
+  </style>
+</head>
+
+<body></body>
+<script>
+  // 아이패드 당기기 새로고침 방지
+  document.addEventListener('touchmove', function (e) {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+      return;
+    }
+    e.preventDefault();
+  }, { passive: false });
+
+  const jsPsych = initJsPsych({
+    on_finish: function () {
+      const surveyData = jsPsych.data.get().filter({ task: 'participant_info' }).values()[0].response;
+      const participantName = surveyData.participant_name;
+      const participantId = surveyData.participant_id;
+      const phoneEnd = surveyData.phone_end;
+      const sessionType = surveyData.session_type;
+
+      const now = new Date();
+      const timestamp = now.getFullYear() + '-' +
+        String(now.getMonth() + 1).padStart(2, '0') + '-' +
+        String(now.getDate()).padStart(2, '0') + ' ' +
+        String(now.getHours()).padStart(2, '0') + ':' +
+        String(now.getMinutes()).padStart(2, '0') + ':' +
+        String(now.getSeconds()).padStart(2, '0');
+
+      // 측정 문항(question_id)이 있는 데이터만 필터링
+      const rawData = jsPsych.data.get().filterCustom(function (trial) {
+        return trial.question_id !== undefined;
+      }).values();
+
+      const filteredData = rawData.map(function (trial) {
+        return {
+          name: participantName,
+          id: participantId,
+          phone: phoneEnd,
+          session: sessionType,
+          question_id: trial.question_id,
+          response: trial.response,
+          timestamp: timestamp
+        };
+      });
+
+      let csvData = "name,id,phone,session,question_id,response,timestamp\n";
+      filteredData.forEach(function (row) {
+        csvData += `"${row.name}","${row.id}","${row.phone}","${row.session}","${row.question_id}","${row.response}","${row.timestamp}"\n`;
+      });
+
+      let googleSheetUrl = '';
+      if (sessionType === 'Pre') {
+        // ========== 수정 필요: PRE 구글 시트 URL ==========
+        googleSheetUrl = '이곳에_PRE_구글시트_앱스크립트_URL을_넣으세요';
+      } else if (sessionType === 'Post') {
+        // ========== 수정 필요: POST 구글 시트 URL ==========
+        googleSheetUrl = '이곳에_POST_구글시트_앱스크립트_URL을_넣으세요';
+      }
+
+      fetch(googleSheetUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: csvData
+      })
+        .then(response => {
+          document.body.innerHTML = '<p style="font-size:45px; text-align:center; margin-top:20%; color:#28a745;">데이터 전송 완료<br>설문이 종료되었습니다.</p>';
+        })
+        .catch(error => {
+          document.body.innerHTML = '<p style="font-size:45px; text-align:center; margin-top:20%; color:#dc3545;">데이터 전송 실패<br>인터넷 연결을 확인하세요.</p>';
+        });
+    }
+  });
+
+  const timeline = [];
+
+  const info_screen = {
+    type: jsPsychSurveyHtmlForm,
+    preamble: '<h1>피험자 정보를 입력하세요</h1>',
+    html: `
+      <div style="text-align: left; margin: auto; width: 680px; font-size: 35px; line-height: 2;">
+        <label for="participant_name">1. 성함:</label><br>
+        <input type="text" id="participant_name" name="participant_name" required style="font-size: 35px; padding: 10px; width: 100%; margin-bottom: 30px;"><br>
+        
+        <label for="participant_id">2. 연구 대상자 고유번호:</label><br>
+        <input type="text" id="participant_id" name="participant_id" value="DGP25-SNU-0" required style="font-size: 35px; padding: 10px; width: 100%; margin-bottom: 30px;"><br>
+        
+        <label for="phone_end">3. 핸드폰 번호 뒷자리(4자리):</label><br>
+        <input type="text" id="phone_end" name="phone_end" required maxlength="4" style="font-size: 35px; padding: 10px; width: 100%; margin-bottom: 40px;"><br>
+
+        <label>4. 세션 구분:</label><br>
+        <div style="margin-bottom: 30px;">
+          <input type="radio" id="pre" name="session_type" value="Pre" required style="transform: scale(2); margin-right: 15px;">
+          <label for="pre" style="margin-right: 50px;">Pre</label>
+          <input type="radio" id="post" name="session_type" value="Post" required style="transform: scale(2); margin-right: 15px;">
+          <label for="post">Post</label>
+        </div>
+      </div>
+    `,
+    button_label: '설문 시작하기',
+    data: { task: 'participant_info' }
+  };
+  timeline.push(info_screen);
+
+  const questions = [
+    "1. 지금 이 순간 나는 맛있는 음식이 당긴다.",
+    "2. 지금 이 순간 나는 맛있는 음식을 먹고 싶은 충동을 느낀다.",
+    "3. 지금 이 순간 나는 무언가 맛있는 것을 먹고 싶은 강한 욕구를 느낀다.",
+    "4. 지금 이 순간 어떤 음식을 먹으면 나른하거나 무기력하게 느끼지 않을 것 같다.",
+    "5. 지금 이 순간 실컷 먹고 나면 덜 불평하고 덜 짜증을 낼 것 같다.",
+    "6. 지금 이 순간 실컷 먹으면 정신이 더 맑아질 것 같다.",
+    "7. 지금 이 순간 지금 당장 먹어야 속이 텅 비었다고 느끼지 않을 것 같다.",
+    "8. 지금 이 순간 배가 고프다.",
+    "9. 지금 이 순간 먹지 않아서 힘이 없다.",
+    "10. 지금 이 순간 무언가 맛있는 것을 먹고 싶은 욕구가 너무 강한 것 같다.",
+    "11. 지금 이 순간 실제로 맛있는 음식을 먹기 전까지 그것에 대해 계속 생각한다.",
+    "12. 지금 이 순간 맛있는 것을 먹게 되면 멈출 수 없을 것 같다.",
+    "13. 지금 이 순간 내가 원하는 것을 먹게 되면 틀림없이 기분이 좋아질 것이다.",
+    "14. 지금 이 순간 무언가 맛있는 것을 먹으면 기분이 정말 좋을 것이다.",
+    "15. 지금 이 순간 무언가 맛있는 것을 먹으면 모든 것이 완벽해질 것이다."
+  ];
+
+  questions.forEach(function (q, index) {
+    const trial = {
+      type: jsPsychHtmlSliderResponse,
+      stimulus: \`<p style="margin-bottom: 50px; padding: 0 20px;">\${q}</p>\`,
+      labels: ['0<br>(전혀)', '100<br>(매우 그렇다)'],
+      min: 0,
+      max: 100,
+      start: 50,
+      step: 1,
+      slider_width: 520,
+      button_label: '제출 및 다음',
+      require_movement: true,
+      data: { question_id: index + 1, task: "g-fcq-s" }
+    };
+    timeline.push(trial);
+  });
+
+  jsPsych.run(timeline);
+</script>
+</html>
