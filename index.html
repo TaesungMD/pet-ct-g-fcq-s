@@ -99,21 +99,22 @@
         return trial.question_id !== undefined;
       }).values();
 
-      const filteredData = rawData.map(function (trial) {
-        return {
-          name: participantName,
-          id: participantId,
-          phone: phoneEnd,
-          session: sessionType,
-          question_id: trial.question_id,
-          response: trial.response,
-          timestamp: timestamp
-        };
+      // 1번~15번 문항의 응답값을 순서대로 배열에 저장
+      const responses = [];
+      rawData.forEach(function (trial) {
+        responses[trial.question_id - 1] = trial.response;
       });
 
-      let csvData = "name,id,phone,session,question_id,response,timestamp\n";
-      filteredData.forEach(function (row) {
-        csvData += `"${row.name}","${row.id}","${row.phone}","${row.session}","${row.question_id}","${row.response}","${row.timestamp}"\n`;
+      // 가로형(1행) CSV 데이터 만들기 (사용자가 요청한 정확한 형태의 헤더)
+      let csvData = '"타임스탬프","성함","연구 대상자 고유번호","핸드폰 번호 뒷자리(4자리)","1. 지금 이 순간  나는 맛있는 음식이 당긴다.","2. 지금 이 순간  나는 맛있는 음식을 먹고 싶은 충동을  느낀다.","3. 지금 이 순간  나는 무언가 맛있는 것을 먹고 싶은 강한 욕구를 느낀다.","4. 지금 이 순간  어떤 음식을 먹으면 나른하거나 무기력하게 느끼지 않을 것 같다.","5. 지금 이 순간  실컷 먹고 나면 덜 불평하고 덜 짜증을  낼 것 같다.","6. 지금 이 순간  실컷 먹으면 정신이 더 맑아질 것 같다.","7. 지금 이 순간  지금 당장 먹어야 속이 텅 비었다고 느끼지 않을 것 같다.","8. 지금 이 순간  배가 고프다.","9. 지금 이 순간  먹지 않아서 힘이 없다.","10. 지금 이 순간  무언가 맛있는 것을 먹고 싶은 욕구가  너무 강한 것 같다.","11. 지금 이 순간  실제로 맛있는 음식을 먹기 전까지 그것  에 대해 계속 생각한다.","12. 지금 이 순간  맛있는 것을 먹게 되면 멈출 수 없을 것  같다.","13. 지금 이 순간  내가 원하는 것을 먹게 되면 틀림없이  기분이 좋아질 것이다.","14. 지금 이 순간  무언가 맛있는 것을 먹으면 기분이 정말  좋을 것이다.","15. 지금 이 순간  무언가 맛있는 것을 먹으면 모든 것이  완벽해질 것이다."\n';
+      
+      csvData += `"${timestamp}","${participantName}","${participantId}","${phoneEnd}",`;
+      responses.forEach(function(res, index) {
+        if (index === responses.length - 1) {
+          csvData += `"${res}"\n`;
+        } else {
+          csvData += `"${res}",`;
+        }
       });
 
       let googleSheetUrl = '';
