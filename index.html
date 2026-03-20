@@ -3,7 +3,8 @@
 
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>G-FCQ-S Task</title>
@@ -118,10 +119,10 @@
       let googleSheetUrl = '';
       if (sessionType === 'Pre') {
         // ========== 수정 필요: PRE 구글 시트 URL ==========
-        googleSheetUrl = '이곳에_PRE_구글시트_앱스크립트_URL을_넣으세요';
+        googleSheetUrl = 'https://script.google.com/macros/s/AKfycbzvutGJaKXI8-pb8boS56Wx5DaNiJFA9FBXIJfxqFITqeraO1zzpmEqQpwcaLQL99Erxw/exec';
       } else if (sessionType === 'Post') {
         // ========== 수정 필요: POST 구글 시트 URL ==========
-        googleSheetUrl = '이곳에_POST_구글시트_앱스크립트_URL을_넣으세요';
+        googleSheetUrl = 'https://script.google.com/macros/s/AKfycbyCRHtyiwAb15YO_3sAWuTfTpFCS8ipg7Iw69lh4JMf1ILiKuROsH_TWPbgId6RoMEV3w/exec';
       }
 
       fetch(googleSheetUrl, {
@@ -205,4 +206,5 @@
 
   jsPsych.run(timeline);
 </script>
+
 </html>
