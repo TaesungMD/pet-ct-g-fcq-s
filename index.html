@@ -81,9 +81,9 @@
   const jsPsych = initJsPsych({
     on_finish: function () {
       const surveyData = jsPsych.data.get().filter({ task: 'participant_info' }).values()[0].response;
-      const participantName = surveyData.participant_name;
+      const participantName = "N/A"; // 개인정보 제거
       const participantId = surveyData.participant_id;
-      const phoneEnd = surveyData.phone_end;
+      const phoneEnd = "N/A"; // 개인정보 제거
       const sessionType = surveyData.session_type;
 
       const now = new Date();
@@ -107,9 +107,9 @@
 
       // 가로형(1행) CSV 데이터 만들기 (사용자가 요청한 정확한 형태의 헤더)
       let csvData = '"타임스탬프","성함","연구 대상자 고유번호","핸드폰 번호 뒷자리(4자리)","1. 지금 이 순간  나는 맛있는 음식이 당긴다.","2. 지금 이 순간  나는 맛있는 음식을 먹고 싶은 충동을  느낀다.","3. 지금 이 순간  나는 무언가 맛있는 것을 먹고 싶은 강한 욕구를 느낀다.","4. 지금 이 순간  어떤 음식을 먹으면 나른하거나 무기력하게 느끼지 않을 것 같다.","5. 지금 이 순간  실컷 먹고 나면 덜 불평하고 덜 짜증을  낼 것 같다.","6. 지금 이 순간  실컷 먹으면 정신이 더 맑아질 것 같다.","7. 지금 이 순간  지금 당장 먹어야 속이 텅 비었다고 느끼지 않을 것 같다.","8. 지금 이 순간  배가 고프다.","9. 지금 이 순간  먹지 않아서 힘이 없다.","10. 지금 이 순간  무언가 맛있는 것을 먹고 싶은 욕구가  너무 강한 것 같다.","11. 지금 이 순간  실제로 맛있는 음식을 먹기 전까지 그것  에 대해 계속 생각한다.","12. 지금 이 순간  맛있는 것을 먹게 되면 멈출 수 없을 것  같다.","13. 지금 이 순간  내가 원하는 것을 먹게 되면 틀림없이  기분이 좋아질 것이다.","14. 지금 이 순간  무언가 맛있는 것을 먹으면 기분이 정말  좋을 것이다.","15. 지금 이 순간  무언가 맛있는 것을 먹으면 모든 것이  완벽해질 것이다."\n';
-      
+
       csvData += `"${timestamp}","${participantName}","${participantId}","${phoneEnd}",`;
-      responses.forEach(function(res, index) {
+      responses.forEach(function (res, index) {
         if (index === responses.length - 1) {
           csvData += `"${res}"\n`;
         } else {
@@ -147,16 +147,10 @@
     preamble: '<h1>피험자 정보를 입력하세요</h1>',
     html: `
       <div style="text-align: left; margin: auto; width: 680px; font-size: 35px; line-height: 2;">
-        <label for="participant_name">1. 성함:</label><br>
-        <input type="text" id="participant_name" name="participant_name" required style="font-size: 35px; padding: 10px; width: 100%; margin-bottom: 30px;"><br>
-        
-        <label for="participant_id">2. 연구 대상자 고유번호:</label><br>
-        <input type="text" id="participant_id" name="participant_id" value="DGP25-SNU-0" required style="font-size: 35px; padding: 10px; width: 100%; margin-bottom: 30px;"><br>
-        
-        <label for="phone_end">3. 핸드폰 번호 뒷자리(4자리):</label><br>
-        <input type="text" id="phone_end" name="phone_end" required maxlength="4" style="font-size: 35px; padding: 10px; width: 100%; margin-bottom: 40px;"><br>
+        <label for="participant_id">연구 대상자 고유번호 (피험자 ID):</label><br>
+        <input type="text" id="participant_id" name="participant_id" value="DGP25-SNU-0" required style="font-size: 35px; padding: 10px; width: 100%; margin-bottom: 40px;"><br>
 
-        <label>4. 세션 구분:</label><br>
+        <label>세션 구분:</label><br>
         <div style="margin-bottom: 30px;">
           <input type="radio" id="pre" name="session_type" value="Pre" required style="transform: scale(2); margin-right: 15px;">
           <label for="pre" style="margin-right: 50px;">Pre</label>
