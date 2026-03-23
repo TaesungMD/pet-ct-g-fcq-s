@@ -146,17 +146,15 @@
     type: jsPsychSurveyHtmlForm,
     preamble: '<h1>피험자 정보를 입력하세요</h1>',
     html: `
-      <div style="text-align: left; margin: auto; width: 680px; font-size: 35px; line-height: 2;">
-        <label for="participant_id">연구 대상자 고유번호 (피험자 ID):</label><br>
-        <input type="text" id="participant_id" name="participant_id" value="DGP25-SNU-0" required style="font-size: 35px; padding: 10px; width: 100%; margin-bottom: 40px;"><br>
-
+      <div style="text-align: left; margin: auto; width: 500px; font-size: 35px; line-height: 2;">
+        <label for="participant_id">피험자 ID:</label><br>
+        <input type="text" id="participant_id" name="participant_id" required style="font-size: 35px; padding: 10px; width: 100%; margin-bottom: 30px;"><br>
+        
         <label>세션 구분:</label><br>
-        <div style="margin-bottom: 30px;">
-          <input type="radio" id="pre" name="session_type" value="Pre" required style="transform: scale(2); margin-right: 15px;">
-          <label for="pre" style="margin-right: 50px;">Pre</label>
-          <input type="radio" id="post" name="session_type" value="Post" required style="transform: scale(2); margin-right: 15px;">
-          <label for="post">Post</label>
-        </div>
+        <input type="radio" id="pre" name="session_type" value="Pre" required>
+        <label for="pre">Pre</label><br>
+        <input type="radio" id="post" name="session_type" value="Post" required>
+        <label for="post">Post</label>
       </div>
     `,
     button_label: '설문 시작하기',
